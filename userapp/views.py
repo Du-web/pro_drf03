@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework import status
 from rest_framework.response import Response
 
 # Create your views here.
@@ -26,4 +27,19 @@ class EmployeeAPIView(APIView):
                 'status': 200,
                 'message': '查询所有成功',
                 'results': emps_ser
+            })
+
+    def post(self, request, *args, **kwargs):
+        """
+        接收数据并保存在数据库
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        emp_data = request.data
+        if not isinstance(emp_data, dict) or emp_data == {}:
+            return Response({
+                'status': status.HTTP_400_BAD_REQUEST,
+                'message': '请求数据格式有误'
             })

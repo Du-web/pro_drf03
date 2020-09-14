@@ -19,3 +19,16 @@ class EmployeeSerializer(serializers.Serializer):
     def get_pic(self, obj):
 
         return f'{"http://127.0.0.1:8000"}{settings.MEDIA_URL}{obj.pic}'
+
+
+class EmployeeDeSerializer(serializers.Serializer):
+    username = serializers.CharField(
+        max_length=6,
+        min_length=1,
+        error_messages={
+            'max_length': '长度长了',
+            'min_length': '长度短了'
+        }
+    )
+    password = serializers.CharField()
+    phone = serializers.CharField(min_length=11, required=True)
