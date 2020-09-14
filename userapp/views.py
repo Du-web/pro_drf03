@@ -5,7 +5,7 @@ from rest_framework.response import Response
 # Create your views here.
 from rest_framework.views import APIView
 from userapp.models import Employee
-from userapp.serializers import EmployeeSerializer
+from userapp.serializers import EmployeeSerializer,EmployeeDeSerializer
 
 
 class EmployeeAPIView(APIView):
@@ -43,3 +43,15 @@ class EmployeeAPIView(APIView):
                 'status': status.HTTP_400_BAD_REQUEST,
                 'message': '请求数据格式有误'
             })
+        ser = EmployeeDeSerializer(data=emp_data)
+        if ser.is_valid():
+            emp = ser.save()
+            return Response({
+                'status': status.HTTP_200_OK,
+                'message': '用户保存成功',
+                'results': EmployeeSerializer(emp).data
+            })
+        return Response({
+            'status': status.HTTP_400_BAD_REQUEST,
+            'message': ser.errors
+        })
