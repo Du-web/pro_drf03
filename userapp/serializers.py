@@ -42,5 +42,10 @@ class EmployeeDeSerializer(serializers.Serializer):
             raise exceptions.ValidationError('密码不一致')
         return attrs
 
+    def validate_username(self, value):
+        if 'an' in value:
+            raise exceptions.ValidationError('用户名有误')
+        return value
+
     def create(self, validated_data):
         return Employee.objects.create(**validated_data)
