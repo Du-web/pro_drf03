@@ -32,6 +32,15 @@ class EmployeeDeSerializer(serializers.Serializer):
     )
     password = serializers.CharField()
     phone = serializers.CharField(min_length=11, required=True)
+    re_pwd = serializers.CharField()
+
+    def validate(self, attrs):
+        print(attrs)
+        pwd = attrs.get('password')
+        re_pwd = attrs.pop('re_pwd')
+        if pwd != re_pwd:
+            raise exceptions.ValidationError('密码不一致')
+        return attrs
 
     def create(self, validated_data):
         return Employee.objects.create(**validated_data)
