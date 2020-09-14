@@ -32,3 +32,6 @@ class EmployeeDeSerializer(serializers.Serializer):
     )
     password = serializers.CharField()
     phone = serializers.CharField(min_length=11, required=True)
+
+    def create(self, validated_data):
+        return Employee.objects.create(**validated_data)
