@@ -89,3 +89,21 @@ class BookAPIViewV2(APIView):
             'message': '图书添加成功',
             'results': BookModelSerializerV2(book_obj, many=many).data
         })
+
+    def delete(self, request, *args, **kwargs):
+        book_id = kwargs.get('id')
+        if book_id:
+            ids = [book_id]
+        else:
+            ids = request.data.get('ids')
+
+        res = Book.objects.filter(pk__in=ids, is_delete=False).update(is_delete=True)
+        if res:
+            return Response({
+                'status': status.HTTP_200_OK,
+                'message': '删除成功'
+            })
+        return Response({
+            'status': status.HTTP_400_BAD_REQUEST,
+            'message': '删除失败'
+        })
