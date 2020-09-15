@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from userapp.models import Book
-from bookapp.serializers import BookModelSerializer, BookModelDeSerializer
+from bookapp.serializers import BookModelSerializer, BookModelDeSerializer, BookModelSerializerV2
 
 
 class BookAPIView(APIView):
@@ -45,4 +45,47 @@ class BookAPIView(APIView):
             'status': 200,
             'message': '创建图书成功',
             'results': BookModelSerializer(book_obj).data
+        })
+
+
+class BookAPIViewV2(APIView):
+
+    def get(self, request, *args, **kwargs):
+
+        book_id = kwargs.get('id')
+        if book_id:
+            book_obj = Book.objects.get(pk=book_id, is_delete=False)
+            book_data = BookModelSerializer(book_obj).data
+            return Response({
+                'status': 200,
+                'message': '查询单个图书成功',
+                'results': book_data
+            })
+        else:
+            book_all = Book.objects.filter(is_delete=False)
+            book_list = BookModelSerializer(book_all, many=True).data
+            return Response({
+                'status': 200,
+                'message': '查询所有成功',
+                'results': book_list
+            })
+
+    def post(self, request, *args, **kwargs):
+        book_data = request.data
+        if isinstance(book_data, dict) and book_data != {}:
+            many = False
+        elif isinstance(book_data, list):
+            many = True
+        else:
+            return Response({
+                'status': 400,
+                'message': '数据格式有误……'
+            })
+        book_ser = BookModelSerializerV2(data=book_data, many=many)
+        book_ser.is_valid(raise_exception=True)
+        book_obj = book_ser.save()
+        return Response({
+            'status': 200,
+            'message': '图书添加成功',
+            'results': BookModelSerializerV2(book_obj, many=many).data
         })

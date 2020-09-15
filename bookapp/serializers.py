@@ -63,7 +63,7 @@ class BookModelSerializerV2(ModelSerializer):
     """
     class Meta:
         model = Book
-        fields = ('book_name', 'price', 'pic', 'publish', 'authors ')
+        fields = ('book_name', 'price', 'pic', 'publish', 'authors')
         extra_kwargs = {
             'book_name': {
                 'max_length': 18,
