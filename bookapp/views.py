@@ -13,8 +13,10 @@ class BookAPIView(APIView):
     def get(self, request, *args, **kwargs):
         book_id = kwargs.get('id')
         if book_id:
+            # print(book_id)
             book_obj = Book.objects.get(pk=book_id)
             book_data = BookModelSerializer(book_obj).data
+            # print(book_data)
             return Response({
                 'status': 200,
                 'message': '查询单个图书成功',
