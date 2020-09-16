@@ -99,6 +99,12 @@ class BookModelSerializerV2(ModelSerializer):
         return attrs
 
     def validate_price(self, obj):
-        if obj > 100:
-            raise exceptions.ValidationError('图书的价格不能查过100元')
-        return obj
+        request = self.context.get('req')
+        print(request.data.get('re_price'), 111, type(request.data.get('re_price')))
+        print(float(obj), 222, type(float(obj)))
+        if float(obj) == request.data.get('re_price'):
+            if obj > 100:
+                raise exceptions.ValidationError('图书的价格不能查过100元')
+            return obj
+        else:
+            raise exceptions.ValidationError('两次输入价格不一致')

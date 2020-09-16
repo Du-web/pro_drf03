@@ -190,7 +190,11 @@ class BookAPIViewV2(APIView):
             except:
                 index = book_ids.index(pk)
                 book_data.pop(index)
-        book_ser = BookModelSerializerV2(data=book_data, instance=book_list, partial=True, many=True)
+        book_ser = BookModelSerializerV2(data=book_data,
+                                         instance=book_list,
+                                         partial=True,
+                                         many=True,
+                                         context={'req': request})
         book_ser.is_valid(raise_exception=True)
         book_ser.save()
         return Response({
