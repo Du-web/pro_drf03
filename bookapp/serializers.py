@@ -57,11 +57,22 @@ class BookModelDeSerializer(ModelSerializer):
         return obj
 
 
+class BookListSerializer(serializers.ListSerializer):
+    """
+    使用此序列化器同时修改多个对象
+    """
+    def update(self, instance, validated_data):
+        for index, obj in enumerate(instance):
+            self.child.update(obj, validated_data[index])
+        return instance
+
+
 class BookModelSerializerV2(ModelSerializer):
     """
     序列化器与反序列化器整合
     """
     class Meta:
+        list_serializer_class = BookListSerializer
         model = Book
         fields = ('book_name', 'price', 'pic', 'publish', 'authors')
         extra_kwargs = {
