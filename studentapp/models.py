@@ -3,7 +3,16 @@ from django.db import models
 # Create your models here.
 
 
-class Student(models.Model):
+class BaseModel(models.Model):
+    is_delete = models.BooleanField(default=False)
+    create_time = models.DateTimeField(auto_now_add=True)
+    status = models.BooleanField(default=True)
+
+    class Meta:
+        abstract = True
+
+
+class Student(BaseModel):
     gender_choices = (
         (0, 'male'),
         (1, 'female'),
@@ -26,7 +35,7 @@ class Student(models.Model):
         return self.username
 
 
-class Team(models.Model):
+class Team(BaseModel):
     classname = models.CharField(max_length=40)
     subject = models.CharField(max_length=40)
 
