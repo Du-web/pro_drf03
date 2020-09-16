@@ -17,7 +17,6 @@ class Student(models.Model):
     email = models.CharField(max_length=40)
     team_id = models.ForeignKey(to='Team', on_delete=models.CASCADE, db_constraint=False, related_name='students')
 
-
     class Meta:
         db_table = 'db_student'
         verbose_name = '学生表'
