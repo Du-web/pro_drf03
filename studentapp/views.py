@@ -51,4 +51,12 @@ class StudentGenericAPIView(GenericAPIView,
         return APIResponse(data_message='删除成功')
 
 
-
+class StudentGenericMixinView(ListAPIView,
+                              RetrieveAPIView,
+                              CreateAPIView,
+                              DestroyAPIView,
+                              UpdateAPIView,
+                              ListCreateAPIView):
+    queryset = Student.objects.filter(is_delete=False)
+    serializer_class = StudentModelSerializer
+    lookup_field = 'id'
