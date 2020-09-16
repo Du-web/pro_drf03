@@ -182,7 +182,6 @@ class BookAPIViewV2(APIView):
             })
 
         book_list = []
-        new_data = []
         for pk in book_ids:
             try:
                 book_obj = Book.objects.get(pk=pk)

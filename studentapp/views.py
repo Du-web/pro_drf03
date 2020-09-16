@@ -3,8 +3,10 @@ from rest_framework.generics import GenericAPIView, ListAPIView, RetrieveAPIView
     RetrieveUpdateAPIView,RetrieveUpdateDestroyAPIView
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin,CreateModelMixin, UpdateModelMixin,DestroyModelMixin
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 
 from studentapp.models import Student
+from userapp.models import Employee
 from studentapp.serializers import StudentModelSerializer
 from utils.response import APIResponse
 
@@ -60,3 +62,26 @@ class StudentGenericMixinView(ListAPIView,
     queryset = Student.objects.filter(is_delete=False)
     serializer_class = StudentModelSerializer
     lookup_field = 'id'
+
+
+class StudentModelViewSet(ModelViewSet):
+    # queryset = Student.objects.filter(is_delete=False)
+    # serializer_class = StudentModelSerializer
+    # lookup_field = 'id'
+
+    def user_login(self, request, *args, **kwargs):
+        user_data = request.data
+        print(user_data, type(user_data))
+        user_obj = Employee.objects.filter(username=user_data.get('name'), password=user_data.get('pwd'))
+        if user_obj:
+            return APIResponse(data_message='登录成功')
+        else:
+            return APIResponse(data_status=400, data_message='登录失败')
+
+    def user_register(self, request, *args, **kwargs):
+        user_data = request.data
+        try:
+            user_obj = Employee.objects.create(username=user_data.get('name'), password=user_data.get('pwd'))
+            return APIResponse(data_message='注册成功', results=user_obj)
+        except:
+            return APIResponse(data_status=400, data_message='注册失败')
