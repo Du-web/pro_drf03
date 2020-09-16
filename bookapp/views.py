@@ -108,51 +108,92 @@ class BookAPIViewV2(APIView):
             'message': '删除失败'
         })
 
-    def put(self, request, *args, **kwargs):
-        book_data = request.data
-        book_id = kwargs.get('id')
-        try:
-            book_obj = Book.objects.get(pk=book_id)
-        except:
-            return Response({
-                "status": status.HTTP_400_BAD_REQUEST,
-                "message": "图书不存在",
-            })
-        if not isinstance(book_data, dict) or book_data == {}:
-            return Response({
-                "status": 400,
-                "message": "数据格式有误"
-            })
-        book_ser = BookModelSerializerV2(data=book_data, instance=book_obj)
-        book_ser.is_valid(raise_exception=True)
-        book_save = book_ser.save()
-        return Response({
-            "status": 200,
-            "message": "更新成功",
-            "results": BookModelSerializerV2(book_save).data
-        })
+    # def put(self, request, *args, **kwargs):
+    #     book_data = request.data
+    #     book_id = kwargs.get('id')
+    #     try:
+    #         book_obj = Book.objects.get(pk=book_id)
+    #     except:
+    #         return Response({
+    #             "status": status.HTTP_400_BAD_REQUEST,
+    #             "message": "图书不存在",
+    #         })
+    #     if not isinstance(book_data, dict) or book_data == {}:
+    #         return Response({
+    #             "status": 400,
+    #             "message": "数据格式有误"
+    #         })
+    #     book_ser = BookModelSerializerV2(data=book_data, instance=book_obj)
+    #     book_ser.is_valid(raise_exception=True)
+    #     book_save = book_ser.save()
+    #     return Response({
+    #         "status": 200,
+    #         "message": "更新成功",
+    #         "results": BookModelSerializerV2(book_save).data
+    #     })
+    #
+    # def patch(self, request, *args, **kwargs):
+    #
+    #     book_data = request.data
+    #     book_id = kwargs.get('id')
+    #     try:
+    #         book_obj = Book.objects.get(pk=book_id)
+    #     except:
+    #         return Response({
+    #             "status": status.HTTP_400_BAD_REQUEST,
+    #             "message": "图书不存在",
+    #         })
+    #     if not isinstance(book_data, dict) or book_data == {}:
+    #         return Response({
+    #             "status": 400,
+    #             "message": "数据格式有误"
+    #         })
+    #     book_ser = BookModelSerializerV2(data=book_data, instance=book_obj, partial=True)
+    #     book_ser.is_valid(raise_exception=True)
+    #     book_save = book_ser.save()
+    #     return Response({
+    #         "status": 200,
+    #         "message": "更新成功",
+    #         "results": BookModelSerializerV2(book_save).data
+    #     })
 
     def patch(self, request, *args, **kwargs):
 
         book_data = request.data
         book_id = kwargs.get('id')
-        try:
-            book_obj = Book.objects.get(pk=book_id)
-        except:
+        if book_id and isinstance(book_data, dict):
+            book_ids = [book_id]
+            book_data = [book_data]
+        elif not book_id and isinstance(book_data, list):
+            book_ids = []
+            for dic in book_data:
+                pk = dic.pop('id', None)
+                if pk:
+                    book_ids.append(pk)
+                else:
+                    return Response({
+                        'status': 400,
+                        'message': 'id不存在'
+                    })
+        else:
             return Response({
-                "status": status.HTTP_400_BAD_REQUEST,
-                "message": "图书不存在",
+                'status': 400,
+                'message': '参数有误'
             })
-        if not isinstance(book_data, dict) or book_data == {}:
-            return Response({
-                "status": 400,
-                "message": "数据格式有误"
-            })
-        book_ser = BookModelSerializerV2(data=book_data, instance=book_obj, partial=True)
+
+        book_list = []
+        new_data = []
+        for pk in book_ids:
+            try:
+                book_obj = Book.objects.get(pk=pk)
+                book_list.append(book_obj)
+            except:
+                index = book_ids.index(pk)
+                book_data.pop(index)
+        book_ser = BookModelSerializerV2(data=book_data, instance=book_list, partial=True, many=True)
         book_ser.is_valid(raise_exception=True)
-        book_save = book_ser.save()
+        book_ser.save()
         return Response({
-            "status": 200,
-            "message": "更新成功",
-            "results": BookModelSerializerV2(book_save).data
+            'status': 200,
+            'message': '更新成功'
         })
