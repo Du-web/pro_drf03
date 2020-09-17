@@ -85,3 +85,47 @@ class StudentModelViewSet(ModelViewSet):
             return APIResponse(data_message='注册成功', results=user_obj)
         except:
             return APIResponse(data_status=400, data_message='注册失败')
+
+    def update_all(self, request, *args, **kwargs):
+
+        stu_data = request.data
+        stu_id = kwargs.get('id')
+        if stu_id and isinstance(stu_data, dict):
+            stu_ids = [stu_id]
+            stu_data = [stu_data]
+        elif not stu_id and isinstance(stu_data, list):
+            stu_ids = []
+            for dic in stu_data:
+                pk = dic.pop('id', None)
+                if pk:
+                    stu_ids.append(pk)
+                else:
+                    return Response({
+                        'status': 400,
+                        'message': 'id不存在'
+                    })
+        else:
+            return Response({
+                'status': 400,
+                'message': '参数有误'
+            })
+
+        stu_list = []
+        for pk in stu_ids:
+            try:
+                stu_obj = Student.objects.get(pk=pk)
+                stu_list.append(stu_obj)
+            except:
+                index = stu_ids.index(pk)
+                stu_data.pop(index)
+        stu_ser = StudentModelSerializer(data=stu_data,
+                                         instance=stu_list,
+                                         partial=True,
+                                         many=True)
+
+        stu_ser.is_valid(raise_exception=True)
+        stu_ser.save()
+        return Response({
+            'status': 200,
+            'message': '更新成功'
+        })
